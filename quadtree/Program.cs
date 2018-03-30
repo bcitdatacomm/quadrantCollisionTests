@@ -53,29 +53,29 @@ namespace quadtree
             List<Player> playersList = new List<Player>();
             List<Bullet> bulletsList = new List<Bullet>();
             bool[,] buildingCoords = new bool[1000, 1000];
-            var points = new Dictionary<string, int>();
+            var pointToQuad = new Dictionary<string, int>();
 
             DateTime then = DateTime.Now;
             for (int i = 0; i < 250; i++)
             {
                 for (int j = 0; j < 250; j++)
                 {
-                    points[i.ToString() + j.ToString()] = 0;
+                    pointToQuad[i.ToString() + j.ToString()] = 0;
                 }
 
                 for (int j = 250; j < 500; j++)
                 {
-                    points[i.ToString() + j.ToString()] = 4;
+                    pointToQuad[i.ToString() + j.ToString()] = 4;
                 }
 
                 for (int j = 500; j < 750; j++)
                 {
-                    points[i.ToString() + j.ToString()] = 8;
+                    pointToQuad[i.ToString() + j.ToString()] = 8;
                 }
 
                 for (int j = 750; j < 1000; j++)
                 {
-                    points[i.ToString() + j.ToString()] = 12;
+                    pointToQuad[i.ToString() + j.ToString()] = 12;
                 }
             }
 
@@ -83,22 +83,22 @@ namespace quadtree
             {
                 for (int j = 0; j < 250; j++)
                 {
-                    points[i.ToString() + j.ToString()] = 1;
+                    pointToQuad[i.ToString() + j.ToString()] = 1;
                 }
 
                 for (int j = 250; j < 500; j++)
                 {
-                    points[i.ToString() + j.ToString()] = 5;
+                    pointToQuad[i.ToString() + j.ToString()] = 5;
                 }
 
                 for (int j = 500; j < 750; j++)
                 {
-                    points[i.ToString() + j.ToString()] = 9;
+                    pointToQuad[i.ToString() + j.ToString()] = 9;
                 }
 
                 for (int j = 750; j < 1000; j++)
                 {
-                    points[i.ToString() + j.ToString()] = 13;
+                    pointToQuad[i.ToString() + j.ToString()] = 13;
                 }
             }
 
@@ -106,22 +106,22 @@ namespace quadtree
             {
                 for (int j = 0; j < 250; j++)
                 {
-                    points[i.ToString() + j.ToString()] = 2;
+                    pointToQuad[i.ToString() + j.ToString()] = 2;
                 }
 
                 for (int j = 250; j < 500; j++)
                 {
-                    points[i.ToString() + j.ToString()] = 6;
+                    pointToQuad[i.ToString() + j.ToString()] = 6;
                 }
 
                 for (int j = 500; j < 750; j++)
                 {
-                    points[i.ToString() + j.ToString()] = 10;
+                    pointToQuad[i.ToString() + j.ToString()] = 10;
                 }
 
                 for (int j = 750; j < 1000; j++)
                 {
-                    points[i.ToString() + j.ToString()] = 14;
+                    pointToQuad[i.ToString() + j.ToString()] = 14;
                 }
             }
 
@@ -129,22 +129,22 @@ namespace quadtree
             {
                 for (int j = 0; j < 250; j++)
                 {
-                    points[i.ToString() + j.ToString()] = 3;
+                    pointToQuad[i.ToString() + j.ToString()] = 3;
                 }
 
                 for (int j = 250; j < 500; j++)
                 {
-                    points[i.ToString() + j.ToString()] = 7;
+                    pointToQuad[i.ToString() + j.ToString()] = 7;
                 }
 
                 for (int j = 500; j < 750; j++)
                 {
-                    points[i.ToString() + j.ToString()] = 11;
+                    pointToQuad[i.ToString() + j.ToString()] = 11;
                 }
 
                 for (int j = 750; j < 1000; j++)
                 {
-                    points[i.ToString() + j.ToString()] = 15;
+                    pointToQuad[i.ToString() + j.ToString()] = 15;
                 }
             }
 
@@ -167,10 +167,9 @@ namespace quadtree
 
             foreach (Player player in players)
             {
-                var pointsToAdd = new Dictionary<int, bool>();
+                var uniquePoints = new HashSet<int>();
                 float fixX = player.X + 500;
                 float fixY = player.Y + 500;
-                
                 // Test all four points to check for overlap in multiple quadrants
                 String testRight = (fixX + player.Radius).ToString() + (fixY).ToString();
                 String testLeft = (fixX - player.Radius).ToString() + (fixY).ToString();
@@ -183,20 +182,20 @@ namespace quadtree
                 String testBottomLeft = (fixX - player.Radius).ToString() + (fixY - player.Radius).ToString();
 
 
-                pointsToAdd[points[testRight]] = true;
-                pointsToAdd[points[testLeft]] = true;
-                pointsToAdd[points[testTop]] = true;
-                pointsToAdd[points[testBottom]] = true;
+                uniquePoints.Add(pointToQuad[testRight]);
+                uniquePoints.Add(pointToQuad[testLeft]);
+                uniquePoints.Add(pointToQuad[testTop]);
+                uniquePoints.Add(pointToQuad[testBottom]);
                 
-                pointsToAdd[points[testTopRight]] = true;
-                pointsToAdd[points[testTopLeft]] = true;
-                pointsToAdd[points[testBottomRight]] = true;
-                pointsToAdd[points[testBottomLeft]] = true;
+                uniquePoints.Add(pointToQuad[testTopRight]);
+                uniquePoints.Add(pointToQuad[testTopLeft]);
+                uniquePoints.Add(pointToQuad[testBottomRight]);
+                uniquePoints.Add(pointToQuad[testBottomLeft]);
 
-                foreach(KeyValuePair<int, bool> entry in pointsToAdd)
+                foreach(int quadrant in uniquePoints)
                 {
-                    Console.WriteLine(entry.Key);
-                    quadrants[entry.Key].players.Add(player);
+                    Console.WriteLine(quadrant);
+                    quadrants[quadrant].players.Add(player);
                 }
                 
                 playersList.Add(player);
@@ -205,7 +204,7 @@ namespace quadtree
 
             foreach (Bullet bullet in bullets)
             {
-                var pointsToAdd = new Dictionary<int, bool>();
+                var uniquePoints = new HashSet<int>();
                 float fixX = bullet.X + 500;
                 float fixY = bullet.Y + 500;
                 
@@ -219,20 +218,20 @@ namespace quadtree
                 String testBottomRight = (fixX + bullet.Radius).ToString() + (fixY - bullet.Radius).ToString();
                 String testBottomLeft = (fixX - bullet.Radius).ToString() + (fixY - bullet.Radius).ToString();
                 
-                pointsToAdd[points[testRight]] = true;
-                pointsToAdd[points[testLeft]] = true;
-                pointsToAdd[points[testTop]] = true;
-                pointsToAdd[points[testBottom]] = true;
+                uniquePoints.Add(pointToQuad[testRight]);
+                uniquePoints.Add(pointToQuad[testLeft]);
+                uniquePoints.Add(pointToQuad[testTop]);
+                uniquePoints.Add(pointToQuad[testBottom]);
                 
-                pointsToAdd[points[testTopRight]] = true;
-                pointsToAdd[points[testTopLeft]] = true;
-                pointsToAdd[points[testBottomRight]] = true;
-                pointsToAdd[points[testBottomLeft]] = true;
+                uniquePoints.Add(pointToQuad[testTopRight]);
+                uniquePoints.Add(pointToQuad[testTopLeft]);
+                uniquePoints.Add(pointToQuad[testBottomRight]);
+                uniquePoints.Add(pointToQuad[testBottomLeft]);
 
-                foreach(KeyValuePair<int, bool> entry in pointsToAdd)
+                foreach(int quadrant in uniquePoints)
                 {
-                    Console.WriteLine(entry.Key);
-                    quadrants[entry.Key].bullets.Add(bullet);
+                    Console.WriteLine(quadrant);
+                    quadrants[quadrant].bullets.Add(bullet);
                 }
                 
                 bulletsList.Add(bullet);
