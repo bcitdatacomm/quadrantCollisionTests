@@ -165,11 +165,13 @@ namespace quadtree
                 quadrants[i] = new Quadrant();
             }
 
+            DateTime thenish = DateTime.Now;
             foreach (Player player in players)
             {
                 var uniquePoints = new HashSet<int>();
                 float fixX = player.X + 500;
                 float fixY = player.Y + 500;
+                
                 // Test all four points to check for overlap in multiple quadrants
                 String testRight = (fixX + player.Radius).ToString() + (fixY).ToString();
                 String testLeft = (fixX - player.Radius).ToString() + (fixY).ToString();
@@ -194,14 +196,14 @@ namespace quadtree
 
                 foreach(int quadrant in uniquePoints)
                 {
-                    Console.WriteLine(quadrant);
                     quadrants[quadrant].players.Add(player);
                 }
                 
                 playersList.Add(player);
-                Console.WriteLine("Done a Player");
             }
-
+            Console.WriteLine("Players: took {0} to assign", DateTime.Now - thenish);
+            
+            thenish = DateTime.Now;
             foreach (Bullet bullet in bullets)
             {
                 var uniquePoints = new HashSet<int>();
@@ -230,13 +232,12 @@ namespace quadtree
 
                 foreach(int quadrant in uniquePoints)
                 {
-                    Console.WriteLine(quadrant);
                     quadrants[quadrant].bullets.Add(bullet);
                 }
                 
                 bulletsList.Add(bullet);
-                Console.WriteLine("Done a Bullet");
             }
+            Console.WriteLine("Bullets: took {0} to assign", DateTime.Now - thenish);
 
             
             // Naive Speed check
