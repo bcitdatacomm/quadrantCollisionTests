@@ -6,31 +6,33 @@ namespace quadtree
     // Bullet object, randomly initialised
     internal class Bullet
     {
-        public Bullet()
+        public Bullet(Random rng)
         {
-            Random rng = new Random();
             
-            X = rng.Next(-500, 500);
-            Y = rng.Next(-500, 500);
+            
+            Radius = 5;
+            X = rng.Next(-500 + (int)Radius, 500 - (int)Radius);
+            Y = rng.Next(-500 + (int)Radius, 500 - (int)Radius);
         }
         
         public float X { get; set; }
         public float Y { get; set; }
+        public float Radius { get; set; }
     }
 
     // Player object, randomly initialised
     internal class Player
     {
-        public Player()
+        public Player(Random rng)
         {
-            Random rng = new Random();
-            
-            X = rng.Next(-500, 500);
-            Y = rng.Next(-500, 500);
+            Radius = 10;
+            X = rng.Next(-500 + (int)Radius, 500 - (int)Radius);
+            Y = rng.Next(-500 + (int)Radius, 500 - (int)Radius);
         }
         
         public float X { get; set; }
         public float Y { get; set; }
+        public float Radius { get; set; }
     }
 
     // Quadrant object
@@ -44,112 +46,118 @@ namespace quadtree
     {
         public static void Main()
         {
+            Random generator = new Random();
             Quadrant[] quadrants = new Quadrant[16];
             Player[] players = new Player[30];
             Bullet[] bullets = new Bullet[90];
+            List<Player> playersList = new List<Player>();
+            List<Bullet> bulletsList = new List<Bullet>();
             bool[,] buildingCoords = new bool[1000, 1000];
             var points = new Dictionary<string, int>();
 
+            DateTime then = DateTime.Now;
             for (int i = 0; i < 250; i++)
             {
                 for (int j = 0; j < 250; j++)
                 {
                     points[i.ToString() + j.ToString()] = 0;
                 }
-                
+
                 for (int j = 250; j < 500; j++)
                 {
                     points[i.ToString() + j.ToString()] = 4;
                 }
-                
+
                 for (int j = 500; j < 750; j++)
                 {
                     points[i.ToString() + j.ToString()] = 8;
                 }
-                
+
                 for (int j = 750; j < 1000; j++)
                 {
                     points[i.ToString() + j.ToString()] = 12;
                 }
             }
-            
+
             for (int i = 250; i < 500; i++)
             {
                 for (int j = 0; j < 250; j++)
                 {
                     points[i.ToString() + j.ToString()] = 1;
                 }
-                
+
                 for (int j = 250; j < 500; j++)
                 {
                     points[i.ToString() + j.ToString()] = 5;
                 }
-                
+
                 for (int j = 500; j < 750; j++)
                 {
                     points[i.ToString() + j.ToString()] = 9;
                 }
-                
+
                 for (int j = 750; j < 1000; j++)
                 {
                     points[i.ToString() + j.ToString()] = 13;
                 }
             }
-            
+
             for (int i = 500; i < 750; i++)
             {
                 for (int j = 0; j < 250; j++)
                 {
                     points[i.ToString() + j.ToString()] = 2;
                 }
-                
+
                 for (int j = 250; j < 500; j++)
                 {
                     points[i.ToString() + j.ToString()] = 6;
                 }
-                
+
                 for (int j = 500; j < 750; j++)
                 {
                     points[i.ToString() + j.ToString()] = 10;
                 }
-                
+
                 for (int j = 750; j < 1000; j++)
                 {
                     points[i.ToString() + j.ToString()] = 14;
                 }
             }
-            
+
             for (int i = 750; i < 1000; i++)
             {
                 for (int j = 0; j < 250; j++)
                 {
                     points[i.ToString() + j.ToString()] = 3;
                 }
-                
+
                 for (int j = 250; j < 500; j++)
                 {
                     points[i.ToString() + j.ToString()] = 7;
                 }
-                
+
                 for (int j = 500; j < 750; j++)
                 {
                     points[i.ToString() + j.ToString()] = 11;
                 }
-                
+
                 for (int j = 750; j < 1000; j++)
                 {
                     points[i.ToString() + j.ToString()] = 15;
                 }
             }
 
-            for(int i = 0; i < players.Length; i++)
+            Console.WriteLine("Map Population: took {0}", DateTime.Now - then);
+
+            for (int i = 0; i < players.Length; i++)
             {
-                players[i] = new Player();
+                players[i] = new Player(generator);
             }
-            
-            for(int i = 0; i < bullets.Length; i++)
+
+            for (int i = 0; i < bullets.Length; i++)
             {
-                bullets[i] = new Bullet();
+                bullets[i] = new Bullet(generator);
             }
 
             for (int i = 0; i < 16; i++)
@@ -159,85 +167,128 @@ namespace quadtree
 
             foreach (Player player in players)
             {
-                String test = (player.X + 500).ToString() + (player.Y + 500).ToString();
-                quadrants[points[test]].players.Add(player);
+                var pointsToAdd = new Dictionary<int, bool>();
+                float fixX = player.X + 500;
+                float fixY = player.Y + 500;
+                
+                // Test all four points to check for overlap in multiple quadrants
+                String testRight = (fixX + player.Radius).ToString() + (fixY).ToString();
+                String testLeft = (fixX - player.Radius).ToString() + (fixY).ToString();
+                String testTop = (fixX).ToString() + (fixY + player.Radius).ToString();
+                String testBottom = (fixX).ToString() + (fixY - player.Radius).ToString();
+                
+                String testTopRight = (fixX + player.Radius).ToString() + (fixY + player.Radius).ToString();
+                String testTopLeft = (fixX - player.Radius).ToString() + (fixY + player.Radius).ToString();
+                String testBottomRight = (fixX + player.Radius).ToString() + (fixY - player.Radius).ToString();
+                String testBottomLeft = (fixX - player.Radius).ToString() + (fixY - player.Radius).ToString();
+
+
+                pointsToAdd[points[testRight]] = true;
+                pointsToAdd[points[testLeft]] = true;
+                pointsToAdd[points[testTop]] = true;
+                pointsToAdd[points[testBottom]] = true;
+                
+                pointsToAdd[points[testTopRight]] = true;
+                pointsToAdd[points[testTopLeft]] = true;
+                pointsToAdd[points[testBottomRight]] = true;
+                pointsToAdd[points[testBottomLeft]] = true;
+
+                foreach(KeyValuePair<int, bool> entry in pointsToAdd)
+                {
+                    Console.WriteLine(entry.Key);
+                    quadrants[entry.Key].players.Add(player);
+                }
+                
+                playersList.Add(player);
+                Console.WriteLine("Done a Player");
             }
-            
+
             foreach (Bullet bullet in bullets)
             {
-                String test = (bullet.X + 500).ToString() + (bullet.Y + 500).ToString();
-                quadrants[points[test]].bullets.Add(bullet);
-            }
+                var pointsToAdd = new Dictionary<int, bool>();
+                float fixX = bullet.X + 500;
+                float fixY = bullet.Y + 500;
+                
+                String testRight = (fixX + bullet.Radius).ToString() + (fixY).ToString();
+                String testLeft = (fixX - bullet.Radius).ToString() + (fixY).ToString();
+                String testTop = (fixX).ToString() + (fixY + bullet.Radius).ToString();
+                String testBottom = (fixX).ToString() + (fixY - bullet.Radius).ToString();
+                
+                String testTopRight = (fixX + bullet.Radius).ToString() + (fixY + bullet.Radius).ToString();
+                String testTopLeft = (fixX - bullet.Radius).ToString() + (fixY + bullet.Radius).ToString();
+                String testBottomRight = (fixX + bullet.Radius).ToString() + (fixY - bullet.Radius).ToString();
+                String testBottomLeft = (fixX - bullet.Radius).ToString() + (fixY - bullet.Radius).ToString();
+                
+                pointsToAdd[points[testRight]] = true;
+                pointsToAdd[points[testLeft]] = true;
+                pointsToAdd[points[testTop]] = true;
+                pointsToAdd[points[testBottom]] = true;
+                
+                pointsToAdd[points[testTopRight]] = true;
+                pointsToAdd[points[testTopLeft]] = true;
+                pointsToAdd[points[testBottomRight]] = true;
+                pointsToAdd[points[testBottomLeft]] = true;
 
-            // Naive Collisions check
-            int collisions = 0;
-            foreach (Player player in players)
-            {
-                foreach (Bullet bullet in bullets)
+                foreach(KeyValuePair<int, bool> entry in pointsToAdd)
                 {
-                    bool temp = CircleCollided(player.X, player.Y, bullet.X, bullet.Y);
-
-                    if (temp == true)
-                    {
-                        collisions++;
-                    }
-                    
+                    Console.WriteLine(entry.Key);
+                    quadrants[entry.Key].bullets.Add(bullet);
                 }
+                
+                bulletsList.Add(bullet);
+                Console.WriteLine("Done a Bullet");
             }
-            Console.WriteLine("Naive: Got {0} collisions", collisions);
+
             
             // Naive Speed check
-            DateTime then = DateTime.Now;
-            foreach (Player player in players)
+            int collisions = 0;
+            then = DateTime.Now;
+            foreach (Player player in playersList)
             {
-                foreach (Bullet bullet in bullets)
+                for (int i = bulletsList.Count - 1; i >= 0; i--)
                 {
-                    bool temp = CircleCollided(player.X, player.Y, bullet.X, bullet.Y);
+                    if (CircleCollided(player.X, player.Y, player.Radius, bulletsList[i].X, bulletsList[i].Y, bulletsList[i].Radius))
+                    {
+                        bulletsList.RemoveAt(i);
+                        collisions++;
+                    }
                 }
             }
-            Console.WriteLine("Naive: took {0}", DateTime.Now - then);
-            
-            
-            // Quadrant Collisions check
+
+            Console.WriteLine("Naive: took {0} with {1} collisions", DateTime.Now - then, collisions);
+
+            // Quadrant Speed check
             collisions = 0;
+            then = DateTime.Now;
             foreach (Quadrant quad in quadrants)
             {
-                foreach (Player player in quad.players)
+                if (quad.players.Count > 0 && quad.bullets.Count > 0)
                 {
-                    foreach (Bullet bullet in quad.bullets)
+                    foreach (Player player in quad.players)
                     {
-                        bool temp = CircleCollided(player.X, player.Y, bullet.X, bullet.Y);
-                        if (temp == true)
+                        // Backwards using index so we can delete bullets as they're used
+                        for (int i = quad.bullets.Count - 1; i >= 0; i--)
                         {
-                            collisions++;
+                            if (CircleCollided(player.X, player.Y, player.Radius, quad.bullets[i].X, quad.bullets[i].Y,
+                                quad.bullets[i].Radius))
+                            {
+                                // Do Something
+                                quad.bullets.RemoveAt(i);
+                                collisions++;
+                            }
                         }
                     }
                 }
             }
-            Console.WriteLine("Quadrant: Got {0} collisions", collisions);
-            
-            // Quadrant Speed check
-            then = DateTime.Now;
-            foreach (Quadrant quad in quadrants)
-            {
-                foreach (Player player in quad.players)
-                {
-                    foreach (Bullet bullet in quad.bullets)
-                    {
-                        bool temp = CircleCollided(player.X, player.Y, bullet.X, bullet.Y);
-                    }
-                }
-            }
-            Console.WriteLine("Quadrant: took {0}", DateTime.Now - then);
-           
-            Console.WriteLine("Memory used: {0}", GC.GetTotalMemory(true));
+
+            Console.WriteLine("Quadrant: took {0} with {1} collisions", DateTime.Now - then, collisions);
         }
 
-        private static Boolean CircleCollided(float x1, float y1, float x2, float y2)
+
+        private static Boolean CircleCollided(float x1, float y1, float r1, float x2, float y2, float r2)
         {
-            float radius = 10;
-            float distance = ((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2));
-            return (distance < (radius * 2));
+            double distance = Math.Sqrt( (x1-x2)*(x1-x2)+(y1-y2)*(y1-y2) );
+            return (distance < (r1 + r2));
         }
         
     }
