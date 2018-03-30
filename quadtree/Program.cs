@@ -278,15 +278,16 @@ namespace quadtree
                                 collisions++;
                                 quad.bullets.RemoveAt(j);
                                 
-                                if (quad.players[i].Health >= 100)
+                                if (quad.players[i].Health >= 100) // Change that 100 to *Bullet Damage*
                                 {
                                     quad.players.RemoveAt(i);
                                     break;
-                                    //quad.players[i].Health -= 100;
+                                    //quad.players[i].Health -= *Bullet Damage* 100;
                                 }
                                 else
                                 {
                                     //quad.players.RemoveAt(i);
+                                    //break;
                                 }
                             }
                         }
