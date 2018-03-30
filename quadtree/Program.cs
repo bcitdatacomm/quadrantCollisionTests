@@ -26,6 +26,7 @@ namespace quadtree
         public Player(Random rng)
         {
             Radius = 10;
+            Health = 100;
             X = rng.Next(-500 + (int)Radius, 500 - (int)Radius);
             Y = rng.Next(-500 + (int)Radius, 500 - (int)Radius);
         }
@@ -33,6 +34,7 @@ namespace quadtree
         public float X { get; set; }
         public float Y { get; set; }
         public float Radius { get; set; }
+        public int Health;
     }
 
     // Quadrant object
@@ -264,17 +266,28 @@ namespace quadtree
             {
                 if (quad.players.Count > 0 && quad.bullets.Count > 0)
                 {
-                    foreach (Player player in quad.players)
+                    for (int i = quad.players.Count - 1; i >= 0; i--)
                     {
                         // Backwards using index so we can delete bullets as they're used
-                        for (int i = quad.bullets.Count - 1; i >= 0; i--)
+                        for (int j = quad.bullets.Count - 1; j >= 0; j--)
                         {
-                            if (CircleCollided(player.X, player.Y, player.Radius, quad.bullets[i].X, quad.bullets[i].Y,
-                                quad.bullets[i].Radius))
+                            if (CircleCollided(quad.players[i].X, quad.players[i].Y, quad.players[i].Radius, quad.bullets[j].X, quad.bullets[j].Y,
+                                quad.bullets[j].Radius))
                             {
                                 // Do Something
-                                quad.bullets.RemoveAt(i);
                                 collisions++;
+                                quad.bullets.RemoveAt(j);
+                                
+                                if (quad.players[i].Health >= 100)
+                                {
+                                    quad.players.RemoveAt(i);
+                                    break;
+                                    //quad.players[i].Health -= 100;
+                                }
+                                else
+                                {
+                                    //quad.players.RemoveAt(i);
+                                }
                             }
                         }
                     }
