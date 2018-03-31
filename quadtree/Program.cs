@@ -168,6 +168,9 @@ namespace quadtree
             }
 
             DateTime thenish = DateTime.Now;
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            // the code that you want to measure comes here
+           
             foreach (Player player in players)
             {
                 var uniquePoints = new HashSet<int>();
@@ -204,7 +207,12 @@ namespace quadtree
                 playersList.Add(player);
             }
             Console.WriteLine("Players: took {0} to assign", DateTime.Now - thenish);
-            
+            watch.Stop();
+            var elapsedMs = watch.ElapsedTicks / (System.Diagnostics.Stopwatch.Frequency / (1000L * 1000L));
+            Console.WriteLine("Players: took {0} to assign in microseconds", elapsedMs);
+
+            watch = System.Diagnostics.Stopwatch.StartNew();
+
             thenish = DateTime.Now;
             foreach (Bullet bullet in bullets)
             {
@@ -240,8 +248,10 @@ namespace quadtree
                 bulletsList.Add(bullet);
             }
             Console.WriteLine("Bullets: took {0} to assign", DateTime.Now - thenish);
+            watch.Stop();
+            elapsedMs = watch.ElapsedTicks / (System.Diagnostics.Stopwatch.Frequency / (1000L * 1000L));
+            Console.WriteLine("bullets: took {0} to assign - in microseconds", elapsedMs);
 
-            
             // Naive Speed check
             int collisions = 0;
             then = DateTime.Now;
@@ -296,6 +306,7 @@ namespace quadtree
             }
 
             Console.WriteLine("Quadrant: took {0} with {1} collisions", DateTime.Now - then, collisions);
+
         }
 
 
