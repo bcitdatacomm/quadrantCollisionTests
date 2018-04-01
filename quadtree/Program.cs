@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace quadtree
@@ -259,6 +260,12 @@ namespace quadtree
             {
                 for (int i = bulletsList.Count - 1; i >= 0; i--)
                 {
+                    if (buildingCoords[(int) bulletsList[i].X, (int) bulletsList[i].Y])
+                    {
+                        bulletsList.RemoveAt(i);
+                        break;
+                    }
+                    
                     if (CircleCollided(player.X, player.Y, player.Radius, bulletsList[i].X, bulletsList[i].Y, bulletsList[i].Radius))
                     {
                         bulletsList.RemoveAt(i);
@@ -281,6 +288,12 @@ namespace quadtree
                         // Backwards using index so we can delete bullets as they're used
                         for (int j = quad.bullets.Count - 1; j >= 0; j--)
                         {
+                            if (buildingCoords[(int) bulletsList[i].X, (int) bulletsList[i].Y])
+                            {
+                                bulletsList.RemoveAt(i);
+                                break;
+                            }
+                            
                             if (CircleCollided(quad.players[i].X, quad.players[i].Y, quad.players[i].Radius, quad.bullets[j].X, quad.bullets[j].Y,
                                 quad.bullets[j].Radius))
                             {
@@ -292,7 +305,7 @@ namespace quadtree
                                 {
                                     quad.players.RemoveAt(i);
                                     break;
-                                    //quad.players[i].Health -= *Bullet Damage* 100;
+                                    //quad.players[i].Health -= *Bullet Damage*;
                                 }
                                 else
                                 {
@@ -308,7 +321,7 @@ namespace quadtree
             Console.WriteLine("Quadrant: took {0} nanoseconds with {1} collisions", stopClock(), collisions);
         }
 
-        private static Boolean CircleCollided(float x1, float y1, float r1, float x2, float y2, float r2)
+        private static bool CircleCollided(float x1, float y1, float r1, float x2, float y2, float r2)
         {
             double distance = Math.Sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
             return (distance < (r1 + r2));
