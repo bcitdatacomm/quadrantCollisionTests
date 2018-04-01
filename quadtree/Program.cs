@@ -1,4 +1,14 @@
-﻿using System;
+﻿/*
+ *
+ * So the big takeaway here is that quadrant/sector collision is significantly faster (order of magnitude),
+ * but adding the objects to their sectors is too expensive to perform every tick. The options are to go with
+ * the naive check, which is acceptable, or attempt to find a way to only add objects to sectors once, then
+ * get their changes. A real quadtree could theoretically perform that, but may take too long to implement with
+ * other responibilities.
+ * 
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
