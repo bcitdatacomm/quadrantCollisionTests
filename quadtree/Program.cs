@@ -260,7 +260,7 @@ namespace quadtree
             {
                 for (int i = bulletsList.Count - 1; i >= 0; i--)
                 {
-                    if (buildingCoords[(int) bulletsList[i].X, (int) bulletsList[i].Y])
+                    if (buildingCoords[(int) bulletsList[i].X + 500, (int) bulletsList[i].Y + 500])
                     {
                         bulletsList.RemoveAt(i);
                         break;
@@ -288,7 +288,7 @@ namespace quadtree
                         // Backwards using index so we can delete bullets as they're used
                         for (int j = quad.bullets.Count - 1; j >= 0; j--)
                         {
-                            if (buildingCoords[(int) bulletsList[i].X, (int) bulletsList[i].Y])
+                            if (buildingCoords[(int) bulletsList[i].X + 500, (int) bulletsList[i].Y + 500])
                             {
                                 bulletsList.RemoveAt(i);
                                 break;
